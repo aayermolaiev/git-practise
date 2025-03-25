@@ -1,1 +1,2 @@
 This is a conflict on master
+This is a conflict on a test
