@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+    
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+    environment {
+        DESKTOP_DIR = "${env.HOME}/Desktop"
+    }
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'master', url: 'https://github.com/aayermolaiev/git-practise'
+            }
+        }
+        stage('Move myapp.py to Desktop') {
+            steps {
+                sh 'mv myapp.py "$DESKTOP_DIR/"'
+            }
+        }
+    }
+}

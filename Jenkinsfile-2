@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+    stages {
+        stage('Checkout Repository') {
+            steps {
+                git branch: 'feature/*', url: 'https://github.com/aayermolaiev/git-practise'
+            }
+        }
+        stage('Run Python Script') {
+            steps {
+                script {
+                    sh(script: 'python3 myapp.py', returnStatus: false)
+                }
+            }
+        }
+    }
+    post {
+        failure {
+            echo "Pipeline failed due to the failure in the script."
+        }
+        success {
+            echo "Pipeline succeeded."
+        }
+    }
+}
