@@ -2,25 +2,28 @@ pipeline {
     agent any
     
     triggers {
-        pollSCM('H/5 * * * *')
+        pollSCM('H/5 * * * *')  // Poll for changes every 5 minutes
     }
+
     stages {
         stage('Checkout Repository') {
             steps {
-                git branch: 'feature/*', url: 'https://github.com/aayermolaiev/git-practise'
+                echo "Checked out branch: ${env.BRANCH_NAME}"
             }
         }
         stage('Run Python Script') {
             steps {
                 script {
+                    // Run the Python script and fail the pipeline if the script fails
                     sh(script: 'python3 myapp.py', returnStatus: false)
                 }
             }
         }
     }
+
     post {
         failure {
-            echo "Pipeline failed due to the failure in the script."
+            echo "Pipeline failed due to an error in the script."
         }
         success {
             echo "Pipeline succeeded."
