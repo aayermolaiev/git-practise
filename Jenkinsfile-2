@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+    triggers {
+        pollSCM('H/5 * * * *') // Optional: Poll SCM every 5 minutes
+    }
+    environment {
+        BRANCH_PREFIX = 'feature/' // Prefix for target branches
+    }
+    stages {
+        stage('Check Branch') {
+            steps {
+                script {
+                    if (!env.BRANCH_NAME.startsWith(env.BRANCH_PREFIX)) {
+                        error("Branch does not start with '${env.BRANCH_PREFIX}'")
+                    }
+                }
+            }
+        }
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Run Python Script') {
+            steps {
+                script {
+                    try {
+                        sh 'python3 myapp.py' // Execute the script
+                    } catch (Exception e) {
+                        error("Script execution failed: ${e.message}")
+                    }
+                }
+            }
+        }
+    }
+}
