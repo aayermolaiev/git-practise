@@ -1,34 +1,43 @@
 pipeline {
     agent any
 
-    environment {
-        BRANCH_PREFIX = 'feature/' // Prefix for target branches
-    }
     stages {
-        stage('Check Branch') {
+        stage('Checkout Repository') {
             steps {
                 script {
-                    if (!env.BRANCH_NAME.startsWith(env.BRANCH_PREFIX)) {
-                        error("Branch does not start with '${env.BRANCH_PREFIX}'")
-                    }
+                    // The branch has already been checked out by Jenkins in a multibranch pipeline
+                    // But if needed, you could use 'git' to checkout the branch explicitly
+                    echo "Checked out branch: ${env.BRANCH_NAME}"
                 }
             }
         }
-        stage('Checkout Code') {
-            steps {
-                checkout scm
-            }
-        }
+
         stage('Run Python Script') {
             steps {
                 script {
-                    try {
-                        sh 'python3 myapp.py' // Execute the script
-                    } catch (Exception e) {
-                        error("Script execution failed: ${e.message}")
+                    // Run the Python script and capture the return status
+                    def status = sh(script: 'python3 myapp.py', returnStatus: true)
+
+                    // Check the exit code of the script to decide whether to fail
+                    if (status != 0) {
+                        echo "Python script failed with exit code: ${status}. Failing pipeline intentionally."
+                        error "Forcing failure due to script failure."
                     }
+
+                    // Force failure after the script runs (if needed)
+                    echo "Forcing pipeline failure intentionally after script execution."
+                    error "Pipeline fails intentionally after the script ran."
                 }
             }
+        }
+    }
+
+    post {
+        failure {
+            echo "Pipeline failed due to an error or intentional failure."
+        }
+        success {
+            echo "Pipeline succeeded."
         }
     }
 }
