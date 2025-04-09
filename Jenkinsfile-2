@@ -1,8 +1,6 @@
 pipeline {
     agent any
-    triggers {
-        pollSCM('H/5 * * * *') // Optional: Poll SCM every 5 minutes
-    }
+
     environment {
         BRANCH_PREFIX = 'feature/' // Prefix for target branches
     }
